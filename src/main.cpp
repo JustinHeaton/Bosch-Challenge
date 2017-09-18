@@ -241,6 +241,7 @@ bool in_center_of_lane(double d){
   return false;
 }
 
+// Determine the best lane based on the speed and location of other cars on the road
 int get_best_lane(vector<double> scores){
   return std::distance(scores.begin(), std::max_element(scores.begin(), scores.end()));
 }
