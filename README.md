@@ -138,3 +138,25 @@ Any submissions that don't finish within 360 seconds will be considered invalid.
 **Submission file must meet naming standards**
 
 Your file must be named main.cpp and include all the code required to successfully complete the Challenge. In addition, you must use the following map name in your code: highway_map_bosch1.csv
+
+## Model Documentation:
+
+The first step in my path planning model is to process the sensor fusion data to determine the speed and position of the closest cars in each lane (the closest car in front of my car and the closest car behind my car). Based on the current speed and trajectory of the other cars on the road, I am able to predict where they will be at n timesteps in the future and this helps me react to other cars beavior including changing lanes to and from my current lane.
+
+After determining the speed and position of the nearby cars in each lane, I define a score for each lane based on the distance of the nearest car in front of my car, and that cars current speed. 
+```
+Left.score = Left.front_buffer * pow(Left.front_speed, 3);
+Center.score = Center.front_buffer * pow(Center.front_speed, 3) * 1.2;
+Right.score = Right.front_buffer * pow(Right.front_speed, 3);
+```
+As you can see, the speed is given more weight compared to the front buffer distance, and I have given a bias towards the center lane by adding 20% to the center lane score.
+
+Any time my car is less than a specified distance away from the nearest car in front in it's current lane, then I apply a lane change criteria to determine whether or not I should change lanes, and if so, which lane I should change to. 
+
+My lane changing criteria is like this:
+
+* The lane with the highest score is considered to be the best lane.
+* If my current lane is not the best lane, then I will attempt to change lanes towards the best lane.
+* If it is not safe to change lanes based on the speed and position of cars in neighboring lanes, then I will maintain my current lane and slow down to the speed of the closest car in front of me.
+
+To generate trajectories, I used a combination of spline fitting and Jerk Minimizing Trajectory (JMT). 
